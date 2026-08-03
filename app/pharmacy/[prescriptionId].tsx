@@ -409,12 +409,12 @@ export default function DispensePrescriptionScreen() {
             </View>
 
             <View
-              style={[
-                styles.allergyNotice,
-                patient.allergies?.length &&
-                  styles.allergyWarning,
-              ]}
-            >
+                style={[
+                    styles.allergyNotice,
+                    Boolean(patient.allergies?.length) &&
+                    styles.allergyWarning,
+                ]}
+             >
               <Ionicons
                 color={
                   patient.allergies?.length
