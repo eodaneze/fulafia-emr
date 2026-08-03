@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, type Href} from 'expo-router';
 import { useMemo, useState } from 'react';
 import {
   Alert,
@@ -108,7 +108,12 @@ export default function DoctorDashboardScreen() {
       }
     }
 
-    router.push(`/doctor/${patient.id}`);
+    router.push({
+        pathname: '/doctor/[patientId]',
+        params: {
+            patientId: patient.id,
+        },
+     } as Href);
   };
 
   return (

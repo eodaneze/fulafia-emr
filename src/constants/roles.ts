@@ -180,9 +180,17 @@ export const demoAccounts: DemoAccount[] = [
   },
 ];
 
+const fallbackRoleOption: RoleOption = {
+  value: 'administrator',
+  label: 'Administrator',
+  shortLabel: 'Administrator',
+  department: 'System Administration',
+  icon: 'shield-checkmark-outline',
+};
+
 export function getRoleOption(role: UserRole): RoleOption {
   return (
     roleOptions.find((item) => item.value === role) ??
-    roleOptions[0]
+    fallbackRoleOption
   );
 }

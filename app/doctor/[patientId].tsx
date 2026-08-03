@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, type Href} from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -20,6 +20,7 @@ import { laboratoryTestCatalogue } from '@/src/constants/laboratory-tests';
 import { useDoctorStore } from '@/src/store/doctor.store';
 import { useNursingStore } from '@/src/store/nursing.store';
 import { usePatientStore } from '@/src/store/patient.store';
+import { useLaboratoryStore } from '@/src/store/laboratory.store';
 import {
   colors,
   radius,
@@ -102,9 +103,38 @@ export default function DoctorConsultationScreen() {
     state.getPatientById(patientId),
   );
 
-  const latestVitals = useNursingStore((state) =>
-    state.getLatestVitalSignsForPatient(patientId),
-  );
+  const allVitalSigns = useNursingStore(
+  (state) => state.vitalSigns,
+);
+
+const latestVitals = useMemo(() => {
+  return allVitalSigns
+    .filter(
+      (vitalSigns) =>
+        vitalSigns.patientId === patientId,
+    )
+    .sort(
+      (first, second) =>
+        new Date(second.recordedAt).getTime() -
+        new Date(first.recordedAt).getTime(),
+    )[0];
+}, [allVitalSigns, patientId]);
+
+  const allLaboratoryResults = useLaboratoryStore(
+  (state) => state.laboratoryResults,
+);
+
+const laboratoryResults = useMemo(() => {
+  return allLaboratoryResults
+    .filter(
+      (result) => result.patientId === patientId,
+    )
+    .sort(
+      (first, second) =>
+        new Date(second.updatedAt).getTime() -
+        new Date(first.updatedAt).getTime(),
+    );
+}, [allLaboratoryResults, patientId]);
 
   const consultation = useDoctorStore((state) =>
     state.getConsultationByPatientId(patientId),
@@ -224,7 +254,7 @@ export default function DoctorConsultationScreen() {
         </Text>
 
         <AppButton
-          onPress={() => router.replace('/doctor')}
+          onPress={() => router.replace('/doctor' as Href)}
           title="Return to doctor queue"
         />
       </SafeAreaView>
@@ -315,14 +345,18 @@ export default function DoctorConsultationScreen() {
       if (
         remaining.length > 0 &&
         !remaining.some(
-          (diagnosis) => diagnosis.isPrimary,
+            (diagnosis) => diagnosis.isPrimary,
         )
-      ) {
-        remaining[0] = {
-          ...remaining[0],
-          isPrimary: true,
-        };
-      }
+        ) {
+        const firstDiagnosis = remaining[0];
+
+        if (firstDiagnosis) {
+            remaining[0] = {
+            ...firstDiagnosis,
+            isPrimary: true,
+            };
+        }
+     }
 
       return remaining;
     });
@@ -468,7 +502,7 @@ export default function DoctorConsultationScreen() {
       [
         {
           text: 'Return to queue',
-          onPress: () => router.replace('/doctor'),
+          onPress: () => router.replace('/doctor' as Href),
         },
         {
           text: 'Stay on case',
@@ -617,9 +651,10 @@ export default function DoctorConsultationScreen() {
 
             {activeTab === 'summary' ? (
               <SummarySection
+                laboratoryResults={laboratoryResults}
                 latestVitals={latestVitals}
                 patient={patient}
-              />
+                />
             ) : null}
 
             {activeTab === 'history' ? (
@@ -709,18 +744,24 @@ type PatientRecord = NonNullable<
 function SummarySection({
   patient,
   latestVitals,
+  laboratoryResults,
 }: {
   patient: PatientRecord;
+
   latestVitals:
     | ReturnType<
         typeof useNursingStore.getState
       >['vitalSigns'][number]
     | undefined;
+
+  laboratoryResults: ReturnType<
+    typeof useLaboratoryStore.getState
+  >['laboratoryResults'];
 }) {
   return (
     <View style={styles.sectionCard}>
       <SectionHeading
-        description="Review the patient’s current clinical information."
+        description="Review the patient’s current clinical information and validated departmental feedback."
         icon="document-text-outline"
         title="Patient summary"
       />
@@ -733,7 +774,7 @@ function SummarySection({
 
         <InformationRow
           label="Patient category"
-          value={patient.patientType}
+          value={formatPatientCategory(patient.patientType)}
         />
 
         <InformationRow
@@ -756,47 +797,86 @@ function SummarySection({
       </Text>
 
       {latestVitals ? (
-        <View style={styles.vitalsGrid}>
-          <VitalCard
-            label="Blood pressure"
-            value={`${latestVitals.systolicBloodPressure}/${latestVitals.diastolicBloodPressure}`}
-            suffix="mmHg"
-          />
+        <>
+          <View style={styles.vitalsGrid}>
+            <VitalCard
+              label="Blood pressure"
+              suffix="mmHg"
+              value={`${latestVitals.systolicBloodPressure}/${latestVitals.diastolicBloodPressure}`}
+            />
 
-          <VitalCard
-            label="Temperature"
-            value={String(latestVitals.temperature)}
-            suffix="°C"
-          />
+            <VitalCard
+              label="Temperature"
+              suffix="°C"
+              value={String(latestVitals.temperature)}
+            />
 
-          <VitalCard
-            label="Pulse"
-            value={String(latestVitals.pulseRate)}
-            suffix="bpm"
-          />
+            <VitalCard
+              label="Pulse"
+              suffix="bpm"
+              value={String(latestVitals.pulseRate)}
+            />
 
-          <VitalCard
-            label="Oxygen"
-            value={String(
-              latestVitals.oxygenSaturation,
-            )}
-            suffix="%"
-          />
+            <VitalCard
+              label="Oxygen"
+              suffix="%"
+              value={String(
+                latestVitals.oxygenSaturation,
+              )}
+            />
 
-          <VitalCard
-            label="Respiration"
-            value={String(
-              latestVitals.respiratoryRate,
-            )}
-            suffix="/min"
-          />
+            <VitalCard
+              label="Respiration"
+              suffix="/min"
+              value={String(
+                latestVitals.respiratoryRate,
+              )}
+            />
 
-          <VitalCard
-            label="Pain"
-            value={String(latestVitals.painScore)}
-            suffix="/10"
-          />
-        </View>
+            <VitalCard
+              label="Pain"
+              suffix="/10"
+              value={String(latestVitals.painScore)}
+            />
+          </View>
+
+          <View style={styles.triageSummary}>
+            <View style={styles.triageSummaryIcon}>
+              <Ionicons
+                color={getTriageColor(
+                  latestVitals.triageCategory,
+                )}
+                name="alert-circle-outline"
+                size={20}
+              />
+            </View>
+
+            <View style={styles.triageSummaryText}>
+              <Text style={styles.triageSummaryLabel}>
+                Nursing triage
+              </Text>
+
+              <Text
+                style={[
+                  styles.triageSummaryValue,
+                  {
+                    color: getTriageColor(
+                      latestVitals.triageCategory,
+                    ),
+                  },
+                ]}
+              >
+                {formatTriageCategory(
+                  latestVitals.triageCategory,
+                )}
+              </Text>
+            </View>
+
+            <Text style={styles.triageRecordedAt}>
+              {formatDateTime(latestVitals.recordedAt)}
+            </Text>
+          </View>
+        </>
       ) : (
         <Text style={styles.noDataText}>
           No nursing assessment has been recorded.
@@ -816,8 +896,336 @@ function SummarySection({
           </View>
         </>
       ) : null}
+
+      {latestVitals?.nursingNote ? (
+        <>
+          <Text style={styles.subsectionTitle}>
+            Nursing observation
+          </Text>
+
+          <View style={styles.noteBox}>
+            <Text style={styles.noteText}>
+              {latestVitals.nursingNote}
+            </Text>
+          </View>
+        </>
+      ) : null}
+
+      <View style={styles.resultsHeading}>
+        <View>
+          <Text style={styles.subsectionTitle}>
+            Laboratory results
+          </Text>
+
+          <Text style={styles.resultsDescription}>
+            Validated results returned by the laboratory.
+          </Text>
+        </View>
+
+        {laboratoryResults.length > 0 ? (
+          <View style={styles.resultsCountBadge}>
+            <Text style={styles.resultsCountText}>
+              {laboratoryResults.reduce(
+                (total, laboratoryResult) =>
+                  total +
+                  laboratoryResult.results.length,
+                0,
+              )}
+            </Text>
+          </View>
+        ) : null}
+      </View>
+
+      {laboratoryResults.length ? (
+        <View style={styles.returnedResults}>
+          {laboratoryResults.map(
+            (laboratoryResult) => (
+              <View
+                key={laboratoryResult.id}
+                style={styles.resultGroup}
+              >
+                <View style={styles.resultGroupHeader}>
+                  <View>
+                    <Text style={styles.resultGroupTitle}>
+                      Validated laboratory report
+                    </Text>
+
+                    <Text
+                      style={styles.resultGroupSubtitle}
+                    >
+                      {formatDateTime(
+                        laboratoryResult.validatedAt ??
+                          laboratoryResult.updatedAt,
+                      )}
+                    </Text>
+                  </View>
+
+                  <View style={styles.validatedBadge}>
+                    <Ionicons
+                      color={colors.success}
+                      name="checkmark-circle"
+                      size={15}
+                    />
+
+                    <Text style={styles.validatedBadgeText}>
+                      VALIDATED
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.resultGroupBody}>
+                  {laboratoryResult.results.map(
+                    (result) => {
+                      const resultTone =
+                        getLaboratoryResultTone(
+                          result.findingStatus,
+                        );
+
+                      return (
+                        <View
+                          key={`${laboratoryResult.id}-${result.id}`}
+                          style={styles.returnedResultCard}
+                        >
+                          <View
+                            style={
+                              styles.returnedResultHeader
+                            }
+                          >
+                            <View
+                              style={[
+                                styles.returnedResultIcon,
+                                {
+                                  backgroundColor:
+                                    resultTone.background,
+                                },
+                              ]}
+                            >
+                              <Ionicons
+                                color={resultTone.color}
+                                name="flask-outline"
+                                size={19}
+                              />
+                            </View>
+
+                            <View
+                              style={
+                                styles.returnedResultIdentity
+                              }
+                            >
+                              <Text
+                                style={
+                                  styles.returnedResultName
+                                }
+                              >
+                                {result.testName}
+                              </Text>
+
+                              <Text
+                                style={
+                                  styles.returnedResultCode
+                                }
+                              >
+                                {result.testCode}
+                              </Text>
+                            </View>
+
+                            <View
+                              style={[
+                                styles.returnedResultStatus,
+                                {
+                                  backgroundColor:
+                                    resultTone.background,
+                                },
+                              ]}
+                            >
+                              <Text
+                                style={[
+                                  styles.returnedResultStatusText,
+                                  {
+                                    color:
+                                      resultTone.color,
+                                  },
+                                ]}
+                              >
+                                {result.findingStatus.toUpperCase()}
+                              </Text>
+                            </View>
+                          </View>
+
+                          <View
+                            style={styles.returnedResultBody}
+                          >
+                            <Text
+                              style={
+                                styles.returnedResultLabel
+                              }
+                            >
+                              Result
+                            </Text>
+
+                            <Text
+                              style={
+                                styles.returnedResultValue
+                              }
+                            >
+                              {result.result}
+                              {result.unit
+                                ? ` ${result.unit}`
+                                : ''}
+                            </Text>
+
+                            {result.referenceRange ? (
+                              <Text
+                                style={
+                                  styles.returnedResultReference
+                                }
+                              >
+                                Reference range:{' '}
+                                {result.referenceRange}
+                              </Text>
+                            ) : null}
+
+                            <View
+                              style={
+                                styles.returnedResultFindingBox
+                              }
+                            >
+                              <Text
+                                style={
+                                  styles.returnedResultFindingLabel
+                                }
+                              >
+                                FINDING
+                              </Text>
+
+                              <Text
+                                style={
+                                  styles.returnedResultFinding
+                                }
+                              >
+                                {result.finding}
+                              </Text>
+                            </View>
+
+                            {result.comment ? (
+                              <Text
+                                style={
+                                  styles.returnedResultComment
+                                }
+                              >
+                                {result.comment}
+                              </Text>
+                            ) : null}
+                          </View>
+                        </View>
+                      );
+                    },
+                  )}
+                </View>
+              </View>
+            ),
+          )}
+        </View>
+      ) : (
+        <Text style={styles.noDataText}>
+          No validated laboratory results are available.
+        </Text>
+      )}
     </View>
   );
+}
+
+function formatPatientCategory(
+  patientType: PatientRecord['patientType'],
+): string {
+  const labels: Record<
+    PatientRecord['patientType'],
+    string
+  > = {
+    student: 'Student',
+    staff: 'Staff',
+    dependent: 'Dependant',
+    public: 'Public patient',
+  };
+
+  return labels[patientType];
+}
+
+function formatTriageCategory(
+  triageCategory:
+    | 'routine'
+    | 'priority'
+    | 'urgent'
+    | 'emergency',
+): string {
+  return (
+    triageCategory.charAt(0).toUpperCase() +
+    triageCategory.slice(1)
+  );
+}
+
+function getTriageColor(
+  triageCategory:
+    | 'routine'
+    | 'priority'
+    | 'urgent'
+    | 'emergency',
+): string {
+  const colorsByTriage = {
+    routine: colors.success,
+    priority: colors.warning,
+    urgent: colors.danger,
+    emergency: '#9B1C1C',
+  };
+
+  return colorsByTriage[triageCategory];
+}
+
+function formatDateTime(value: string): string {
+  return new Date(value).toLocaleString([], {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+function getLaboratoryResultTone(
+  findingStatus:
+    | 'normal'
+    | 'abnormal'
+    | 'critical'
+    | 'positive'
+    | 'negative',
+): {
+  background: string;
+  color: string;
+} {
+  const tones = {
+    normal: {
+      background: colors.successSoft,
+      color: colors.success,
+    },
+    abnormal: {
+      background: colors.warningSoft,
+      color: colors.warning,
+    },
+    critical: {
+      background: colors.dangerSoft,
+      color: colors.danger,
+    },
+    positive: {
+      background: colors.dangerSoft,
+      color: colors.danger,
+    },
+    negative: {
+      background: colors.successSoft,
+      color: colors.success,
+    },
+  };
+
+  return tones[findingStatus];
 }
 
 function HistorySection({
@@ -1730,6 +2138,235 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontSize: typography.size.label,
     lineHeight: typography.lineHeight.label,
+  },
+
+  triageSummary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.md,
+    padding: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceMuted,
+  },
+
+  triageSummaryIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+  },
+
+  triageSummaryText: {
+    flex: 1,
+    marginLeft: spacing.md,
+  },
+
+  triageSummaryLabel: {
+    color: colors.textMuted,
+    fontSize: 10,
+  },
+
+  triageSummaryValue: {
+    marginTop: 2,
+    fontSize: typography.size.label,
+    fontWeight: typography.weight.bold,
+  },
+
+  triageRecordedAt: {
+    maxWidth: 92,
+    color: colors.textMuted,
+    fontSize: 9,
+    lineHeight: 13,
+    textAlign: 'right',
+  },
+
+  resultsHeading: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+  },
+
+  resultsDescription: {
+    marginTop: -spacing.sm,
+    color: colors.textSecondary,
+    fontSize: typography.size.caption,
+  },
+
+  resultsCountBadge: {
+    minWidth: 30,
+    height: 30,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.round,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.infoSoft,
+  },
+
+  resultsCountText: {
+    color: colors.info,
+    fontSize: typography.size.caption,
+    fontWeight: typography.weight.extraBold,
+  },
+
+  returnedResults: {
+    gap: spacing.lg,
+  },
+
+  resultGroup: {
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+  },
+
+  resultGroupHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+    padding: spacing.md,
+    backgroundColor: colors.surfaceMuted,
+  },
+
+  resultGroupTitle: {
+    color: colors.textPrimary,
+    fontSize: typography.size.label,
+    fontWeight: typography.weight.bold,
+  },
+
+  resultGroupSubtitle: {
+    marginTop: 2,
+    color: colors.textSecondary,
+    fontSize: 10,
+  },
+
+  validatedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 6,
+    borderRadius: radius.round,
+    backgroundColor: colors.successSoft,
+  },
+
+  validatedBadgeText: {
+    color: colors.success,
+    fontSize: 8,
+    fontWeight: typography.weight.extraBold,
+  },
+
+  resultGroupBody: {
+    gap: spacing.md,
+    padding: spacing.md,
+  },
+
+  returnedResultCard: {
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+  },
+
+  returnedResultHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: spacing.md,
+    backgroundColor: colors.surfaceMuted,
+  },
+
+  returnedResultIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  returnedResultIdentity: {
+    flex: 1,
+    marginHorizontal: spacing.md,
+  },
+
+  returnedResultName: {
+    color: colors.textPrimary,
+    fontSize: typography.size.label,
+    fontWeight: typography.weight.bold,
+  },
+
+  returnedResultCode: {
+    marginTop: 2,
+    color: colors.textSecondary,
+    fontSize: 10,
+  },
+
+  returnedResultStatus: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 6,
+    borderRadius: radius.round,
+  },
+
+  returnedResultStatusText: {
+    fontSize: 8,
+    fontWeight: typography.weight.extraBold,
+  },
+
+  returnedResultBody: {
+    padding: spacing.md,
+  },
+
+  returnedResultLabel: {
+    color: colors.textMuted,
+    fontSize: 10,
+  },
+
+  returnedResultValue: {
+    marginTop: spacing.xs,
+    color: colors.textPrimary,
+    fontSize: typography.size.bodyLarge,
+    fontWeight: typography.weight.extraBold,
+  },
+
+  returnedResultReference: {
+    marginTop: spacing.xs,
+    color: colors.textSecondary,
+    fontSize: typography.size.caption,
+  },
+
+  returnedResultFindingBox: {
+    marginTop: spacing.md,
+    padding: spacing.md,
+    borderRadius: radius.sm,
+    backgroundColor: colors.surfaceMuted,
+  },
+
+  returnedResultFindingLabel: {
+    color: colors.primary,
+    fontSize: 9,
+    fontWeight: typography.weight.extraBold,
+    letterSpacing: 0.8,
+  },
+
+  returnedResultFinding: {
+    marginTop: spacing.xs,
+    color: colors.textSecondary,
+    fontSize: typography.size.caption,
+    lineHeight: typography.lineHeight.caption,
+  },
+
+  returnedResultComment: {
+    marginTop: spacing.md,
+    padding: spacing.md,
+    borderRadius: radius.sm,
+    color: colors.textSecondary,
+    fontSize: typography.size.caption,
+    lineHeight: typography.lineHeight.caption,
+    backgroundColor: colors.infoSoft,
   },
 
   fieldGap: {
