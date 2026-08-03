@@ -118,6 +118,20 @@ export default function RootLayout() {
             animation: 'slide_from_right',
           }}
         />
+
+        <Stack.Screen
+          name="pharmacy/index"
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
+
+        <Stack.Screen
+          name="pharmacy/[prescriptionId]"
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
       </Stack>
     </>
   );

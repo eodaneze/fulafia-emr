@@ -50,6 +50,9 @@ export default function WorkflowScreen() {
       case 'laboratory_scientist':
         return '/laboratory' as Href;
 
+     case 'pharmacist':
+        return '/pharmacy' as Href;
+
       /*
        * We will connect these roles when their modules
        * have been implemented.
@@ -178,6 +181,9 @@ function getRoleWorkflowIcon(
 
     case 'laboratory_scientist':
       return 'flask-outline';
+
+    case 'pharmacist':
+      return 'bandage-outline';
 
     default:
       return 'git-network-outline';
