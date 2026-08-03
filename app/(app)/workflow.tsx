@@ -1,6 +1,18 @@
+import { Redirect } from 'expo-router';
+
 import { ModulePreviewScreen } from '@/src/components';
+import { useAuthStore } from '@/src/store/auth.store';
 
 export default function WorkflowScreen() {
+  const user = useAuthStore((state) => state.user);
+
+  if (
+    user?.role === 'outpatient_nurse' ||
+    user?.role === 'ward_nurse'
+  ) {
+    return <Redirect href="/nursing" />;
+  }
+
   return (
     <ModulePreviewScreen
       description="Follow the patient from registration through nursing, doctor review, laboratory, pharmacy and discharge."

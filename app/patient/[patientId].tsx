@@ -149,7 +149,10 @@ export default function PatientDetailsScreen() {
           <QuickAction
             icon="medkit-outline"
             label="Send to nursing"
-          />
+            onPress={() =>
+                router.push(`/nursing/${patient.id}`)
+            }
+         />
 
           <QuickAction
             icon="card-outline"
@@ -354,12 +357,15 @@ function ProfileDetail({
 function QuickAction({
   icon,
   label,
+  onPress,
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
+  onPress?: () => void;
 }) {
   return (
     <Pressable
+      onPress={onPress}
       style={({ pressed }) => [
         styles.quickAction,
         pressed && styles.pressed,
