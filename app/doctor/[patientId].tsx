@@ -2737,4 +2737,55 @@ const styles = StyleSheet.create({
     fontSize: typography.size.sectionTitle,
     fontWeight: typography.weight.bold,
   },
+
+  reviewActionCard: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: spacing.md,
+  marginTop: spacing.lg,
+  padding: spacing.lg,
+  borderWidth: 1,
+  borderColor: '#BDE6D2',
+  borderRadius: radius.lg,
+  backgroundColor: colors.successSoft,
+},
+
+reviewActionIcon: {
+  width: 46,
+  height: 46,
+  borderRadius: radius.md,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: colors.surface,
+},
+
+reviewActionText: {
+  flex: 1,
+},
+
+reviewActionTitle: {
+  color: colors.textPrimary,
+  fontSize: typography.size.label,
+  fontWeight: typography.weight.bold,
+},
+
+reviewActionDescription: {
+  marginTop: spacing.xs,
+  color: colors.textSecondary,
+  fontSize: typography.size.caption,
+  lineHeight: typography.lineHeight.caption,
+},
+
+reviewActionButton: {
+  width: 40,
+  height: 40,
+  borderRadius: radius.round,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: colors.primary,
+},
+
+reviewActionButtonPressed: {
+  opacity: 0.7,
+},
 });
