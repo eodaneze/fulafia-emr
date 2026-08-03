@@ -48,6 +48,20 @@ export default function RootLayout() {
             animation: 'fade',
           }}
         />
+
+        <Stack.Screen
+          name="patient/register"
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
+
+        <Stack.Screen
+          name="patient/[patientId]"
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
       </Stack>
     </>
   );
