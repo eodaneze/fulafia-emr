@@ -7,6 +7,39 @@ export type ConsultationStatus =
   | 'admitted'
   | 'discharged';
 
+export type PatientDisposition =
+  | 'undecided'
+  | 'outpatient'
+  | 'admission'
+  | 'discharged';
+
+export type PrescriptionStatus =
+  | 'pending'
+  | 'partially_dispensed'
+  | 'dispensed'
+  | 'out_of_stock'
+  | 'cancelled';
+
+export type MedicationFrequency =
+  | 'once_daily'
+  | 'twice_daily'
+  | 'three_times_daily'
+  | 'four_times_daily'
+  | 'at_night'
+  | 'when_required'
+  | 'stat'
+  | 'other';
+
+export type MedicationRoute =
+  | 'oral'
+  | 'intravenous'
+  | 'intramuscular'
+  | 'subcutaneous'
+  | 'topical'
+  | 'inhalation'
+  | 'rectal'
+  | 'other';
+
 export type LaboratoryRequestStatus =
   | 'requested'
   | 'sample_collected'
@@ -51,6 +84,10 @@ export type Consultation = {
 
   examinationFindings: ExaminationFinding[];
   differentialDiagnoses: DifferentialDiagnosis[];
+
+  definitiveDiagnosis?: string;
+  disposition: PatientDisposition;
+  reviewNote?: string;
 
   createdAt: string;
   updatedAt: string;
@@ -105,4 +142,77 @@ export type CreateLaboratoryRequestPayload = {
   tests: LaboratoryTestOption[];
   clinicalNote?: string;
   priority: 'routine' | 'urgent';
+};
+
+export type PrescriptionItem = {
+  id: string;
+
+  drugName: string;
+  strength: string;
+  dose: string;
+
+  frequency: MedicationFrequency;
+  customFrequency?: string;
+
+  route: MedicationRoute;
+  duration: string;
+  quantity: number;
+
+  instruction?: string;
+
+  dispensedQuantity: number;
+  dispensingStatus:
+    | 'pending'
+    | 'partial'
+    | 'dispensed'
+    | 'out_of_stock';
+};
+
+export type Prescription = {
+  id: string;
+
+  patientId: string;
+  consultationId: string;
+
+  definitiveDiagnosis: string;
+  disposition: PatientDisposition;
+
+  items: PrescriptionItem[];
+  generalInstruction?: string;
+
+  prescribedBy: {
+    id: string;
+    fullName: string;
+    employeeId: string;
+  };
+
+  status: PrescriptionStatus;
+
+  prescribedAt: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CompleteDoctorReviewPayload = {
+  patientId: string;
+  consultationId: string;
+
+  definitiveDiagnosis: string;
+  disposition: PatientDisposition;
+  reviewNote?: string;
+};
+
+export type CreatePrescriptionPayload = {
+  patientId: string;
+  consultationId: string;
+
+  definitiveDiagnosis: string;
+  disposition: PatientDisposition;
+
+  items: Omit<
+    PrescriptionItem,
+    'dispensedQuantity' | 'dispensingStatus'
+  >[];
+
+  generalInstruction?: string;
 };

@@ -1,5 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router, useLocalSearchParams, type Href} from 'expo-router';
+import {
+  router,
+  useLocalSearchParams,
+  type Href,
+} from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -704,6 +708,58 @@ const laboratoryResults = useMemo(() => {
                 setPriority={setLaboratoryPriority}
                 toggleTest={toggleLaboratoryTest}
               />
+            ) : null}
+
+
+            {laboratoryResults.length > 0 ? (
+              <View style={styles.reviewActionCard}>
+                <View style={styles.reviewActionIcon}>
+                  <Ionicons
+                    color={colors.success}
+                    name="checkmark-done-outline"
+                    size={24}
+                  />
+                </View>
+
+                <View style={styles.reviewActionText}>
+                  <Text style={styles.reviewActionTitle}>
+                    Laboratory results ready
+                  </Text>
+
+                  <Text
+                    style={styles.reviewActionDescription}
+                  >
+                    Review the validated results, record the
+                    definitive diagnosis and choose outpatient
+                    treatment or admission.
+                  </Text>
+                </View>
+
+                <Pressable
+                  accessibilityLabel="Open doctor result review"
+                  accessibilityRole="button"
+                  onPress={() =>
+                    router.push({
+                      pathname:
+                        '/doctor/review/[patientId]',
+                      params: {
+                        patientId: patient.id,
+                      },
+                    } as Href)
+                  }
+                  style={({ pressed }) => [
+                    styles.reviewActionButton,
+                    pressed &&
+                      styles.reviewActionButtonPressed,
+                  ]}
+                >
+                  <Ionicons
+                    color={colors.textOnPrimary}
+                    name="arrow-forward"
+                    size={20}
+                  />
+                </Pressable>
+              </View>
             ) : null}
 
             <View style={styles.actions}>
