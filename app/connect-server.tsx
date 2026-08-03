@@ -27,6 +27,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 
 type ConnectionState = 'idle' | 'testing' | 'connected' | 'failed';
 
@@ -72,10 +73,7 @@ export default function ConnectServerScreen() {
   };
 
   const continueToLogin = () => {
-    Alert.alert(
-      'Connection saved',
-      'The login screen will be implemented in the next step.',
-    );
+    router.replace('/login');
   };
 
   return (
