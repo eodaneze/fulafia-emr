@@ -76,6 +76,20 @@ export default function RootLayout() {
             animation: 'slide_from_right',
           }}
         />
+
+        <Stack.Screen
+          name="doctor/index"
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
+
+        <Stack.Screen
+          name="doctor/[patientId]"
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
       </Stack>
     </>
   );

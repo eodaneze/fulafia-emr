@@ -13,6 +13,10 @@ export default function WorkflowScreen() {
     return <Redirect href="/nursing" />;
   }
 
+  if (user?.role === 'doctor') {
+    return <Redirect href="/doctor" />;
+  }
+
   return (
     <ModulePreviewScreen
       description="Follow the patient from registration through nursing, doctor review, laboratory, pharmacy and discharge."
