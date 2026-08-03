@@ -84,15 +84,20 @@ export default function NursingQueueScreen() {
     <SafeAreaView style={styles.screen}>
       <View style={styles.header}>
         <Pressable
-          hitSlop={10}
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Ionicons
-            color={colors.textPrimary}
-            name="arrow-back"
-            size={23}
-          />
+            accessibilityLabel="Return to home dashboard"
+            accessibilityRole="button"
+            hitSlop={10}
+            onPress={() => router.replace('/(app)')}
+            style={({ pressed }) => [
+                styles.backButton,
+                pressed && styles.pressed,
+            ]}
+            >
+            <Ionicons
+                color={colors.textPrimary}
+                name="home-outline"
+                size={22}
+            />
         </Pressable>
 
         <View style={styles.headerText}>
@@ -491,8 +496,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.surfaceMuted,
-  },
-
+    borderWidth: 1,
+    borderColor: colors.border,
+ },
   headerText: {
     flex: 1,
     marginHorizontal: spacing.md,
