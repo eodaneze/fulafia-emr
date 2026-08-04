@@ -1,5 +1,8 @@
-import { Redirect } from 'expo-router';
+import {
+  Redirect,
+  type Href,
+} from 'expo-router';
 
-export default function StaffDetailsRoute() {
-  return <Redirect href="/hr" />;
+export default function CreateStaffRoute() {
+  return <Redirect href={'/hr' as Href} />;
 }
