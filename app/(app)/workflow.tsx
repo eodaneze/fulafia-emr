@@ -41,8 +41,10 @@ export default function WorkflowScreen() {
   const getWorkflowRoute = (): Href | null => {
     switch (user?.role) {
       case 'outpatient_nurse':
-      case 'ward_nurse':
         return '/nursing' as Href;
+
+      case 'ward_nurse':
+        return '/ward' as Href;
 
       case 'doctor':
         return '/doctor' as Href;
@@ -176,8 +178,10 @@ function getRoleWorkflowIcon(
       return 'medical-outline';
 
     case 'outpatient_nurse':
-    case 'ward_nurse':
       return 'medkit-outline';
+
+    case 'ward_nurse':
+      return 'bed-outline';
 
     case 'laboratory_scientist':
       return 'flask-outline';

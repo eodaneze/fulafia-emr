@@ -132,6 +132,27 @@ export default function RootLayout() {
             animation: 'slide_from_right',
           }}
         />
+
+        <Stack.Screen
+          name="ward/index"
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
+
+        <Stack.Screen
+          name="ward/admit/[patientId]"
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
+
+        <Stack.Screen
+          name="ward/[admissionId]"
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
       </Stack>
     </>
   );
