@@ -126,9 +126,11 @@ export default function AdmitPatientScreen() {
       return;
     }
 
+    const createdAdmission = result.data;
+
     Alert.alert(
       'Patient admitted',
-      `${patient.fullName} has been allocated to ${result.data.wardName}, Bed ${result.data.bedNumber}.`,
+      `${patient.fullName} has been allocated to ${createdAdmission.wardName}, Bed ${createdAdmission.bedNumber}.`,
       [
         {
           text: 'Open inpatient record',
@@ -136,7 +138,7 @@ export default function AdmitPatientScreen() {
             router.replace({
               pathname: '/ward/[admissionId]',
               params: {
-                admissionId: result.data?.id,
+                admissionId: createdAdmission.id,
               },
             } as Href),
         },

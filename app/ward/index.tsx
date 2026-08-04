@@ -544,7 +544,7 @@ function AdmittedPatientCard({
           params: {
             admissionId: admission.id,
           },
-        } as Href)
+        })
       }
       style={({ pressed }) => [
         styles.patientCard,
