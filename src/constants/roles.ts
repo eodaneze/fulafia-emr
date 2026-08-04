@@ -199,6 +199,16 @@ export const demoAccounts: DemoAccount[] = [
     department: 'Pharmacy',
     designation: 'Pharmacist',
   },
+  {
+     id: 'staff-human-resources-001',
+     employeeId: 'FULCH-HR-001',
+     fullName: 'Mrs. Mary Adamu',
+     email: 'human-resources@fulafia-hospital.local',
+     password: 'password',
+     role: 'human_resources',
+     department: 'Human Resources',
+    designation: 'Human Resources Officer',
+  },
 ];
 
 const fallbackRoleOption: RoleOption = {

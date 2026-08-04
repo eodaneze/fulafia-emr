@@ -58,6 +58,9 @@ export default function WorkflowScreen() {
      case 'director':
         return '/director' as Href;
 
+     case 'human_resources':
+        return '/hr' as Href;
+
       /*
        * We will connect these roles when their modules
        * have been implemented.
@@ -194,6 +197,9 @@ function getRoleWorkflowIcon(
 
     case 'director':
        return 'analytics-outline';
+
+    case 'human_resources':
+       return 'people-outline';
 
     default:
       return 'git-network-outline';

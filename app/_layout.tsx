@@ -160,6 +160,27 @@ export default function RootLayout() {
             animation: 'slide_from_right',
           }}
         />
+
+        <Stack.Screen
+          name="hr/index"
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
+
+        <Stack.Screen
+          name="hr/[staffId]"
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
+
+        <Stack.Screen
+          name="hr/create"
+          options={{
+            animation: 'slide_from_bottom',
+          }}
+        />
       </Stack>
     </>
   );
