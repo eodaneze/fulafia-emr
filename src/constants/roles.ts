@@ -148,6 +148,27 @@ export const demoAccounts: DemoAccount[] = [
     department: 'Outpatient Nursing',
     designation: 'Outpatient Nurse',
   },
+  
+  {
+    id: 'staff-ward-nurse-001',
+    employeeId: 'FULCH-WARD-001',
+    fullName: 'Nurse Grace John',
+    email: 'ward-nurse@fulafia-hospital.local',
+    password: 'password',
+    role: 'ward_nurse',
+    department: 'Ward Nursing',
+    designation: 'Ward Nurse',
+  },
+  {
+    id: 'staff-doctor-001',
+    employeeId: 'FULCH-DOC-001',
+    fullName: 'Dr. Sarah Emmanuel',
+    email: 'doctor@fulafia-hospital.local',
+    password: 'password',
+    role: 'doctor',
+    department: 'Clinical Services',
+    designation: 'Medical Officer',
+  },
   {
     id: 'demo-doctor-001',
     employeeId: 'FULCH-DOC-001',
