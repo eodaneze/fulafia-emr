@@ -209,6 +209,26 @@ export const demoAccounts: DemoAccount[] = [
      department: 'Human Resources',
     designation: 'Human Resources Officer',
   },
+  {
+     id: 'staff-store-officer-001',
+     employeeId: 'FULCH-STORE-001',
+     fullName: 'Mrs. Mary Adamu',
+     email: 'store-officer@fulafia-hospital.local',
+     password: 'password',
+     role: 'store_officer',
+     department: 'Inventory and Stores',
+    designation: 'Store Officer',
+  },
+  {
+     id: 'staff-administrator-001',
+     employeeId: 'FULCH-ADMIN-001',
+     fullName: 'Mr. Ibrahim Sule',
+     email: 'administrator@fulafia-hospital.local',
+     password: 'password',
+     role: 'administrator',
+     department: 'System Administration',
+    designation: 'System Administrator',
+  },
 ];
 
 const fallbackRoleOption: RoleOption = {

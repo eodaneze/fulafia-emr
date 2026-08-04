@@ -181,6 +181,26 @@ export default function RootLayout() {
             animation: 'slide_from_bottom',
           }}
         />
+
+        <Stack.Screen
+          name="equipment/index"
+          options={{ animation: 'slide_from_right' }}
+        />
+
+        <Stack.Screen
+          name="equipment/[equipmentId]"
+          options={{ animation: 'slide_from_right' }}
+        />
+
+        <Stack.Screen
+          name="equipment/create"
+          options={{ animation: 'slide_from_bottom' }}
+        />
+
+        <Stack.Screen
+          name="reports/index"
+          options={{ animation: 'slide_from_right' }}
+        />
       </Stack>
     </>
   );
